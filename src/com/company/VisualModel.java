@@ -22,7 +22,7 @@ class VisualModel implements GLEventListener {
     private GLCanvas canvas;
     private VisualModel visualModelContext;
     private List<List<Character>> map;
-    private MouseController mc = new MouseController();
+    private MouseController mouseController = new MouseController();
 
     public void show(List<List<Character>> map) {
         GLProfile glp = GLProfile.getDefault();
@@ -39,9 +39,9 @@ class VisualModel implements GLEventListener {
         visualModelContext = new VisualModel();
         visualModelContext.map = map;
         canvas.addGLEventListener(visualModelContext);
-        canvas.addMouseListener(mc);
-        canvas.addMouseMotionListener(mc);
-        canvas.addMouseWheelListener(mc);
+        canvas.addMouseListener(mouseController);
+        canvas.addMouseMotionListener(mouseController);
+        canvas.addMouseWheelListener(mouseController);
 
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -57,8 +57,6 @@ class VisualModel implements GLEventListener {
         gl.glClearDepth(1.0f);
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glDepthFunc(GL.GL_LEQUAL);
-        gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
-        gl.glShadeModel(GL2.GL_SMOOTH);
     }
 
     @Override
@@ -89,7 +87,7 @@ class VisualModel implements GLEventListener {
 
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glLoadIdentity();
-        gl.glTranslatef(0.0f, -4.0f, distance);
+        gl.glTranslatef(0.0f, -3.0f, distance);
 
         gl.glRotatef(rAngle, rx, ry, rz);
 
