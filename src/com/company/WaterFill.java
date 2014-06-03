@@ -35,7 +35,6 @@ class WaterFill {
         fill();
     }
 
-    @SuppressWarnings("unused")
     public void show(){
         for(int i = maxHeight - 1; i >= 0; --i){
             for (List<Character> row : map) {
@@ -110,7 +109,7 @@ class WaterFill {
 
     private int findDecreasingProgression(int i, int right) {
         int leftMax = levels[i];
-        while (i + 1 < right && levels[i] < levels[i + 1]){
+        while (i + 1 < right && levels[i] <= levels[i + 1]){
             i++;
             if(levels[i] > leftMax){
                 return i;

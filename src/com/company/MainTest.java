@@ -18,11 +18,20 @@ public class MainTest {
     }
 
     @Test
-    public void allocatingTest(){
+    public void allocatingTest0(){
         int[] args = {1, 4, 2, 0, 6, 1, 2, 5};
         WaterFill waterFill = new WaterFill(args);
         assertNotEquals(waterFill.getData().get(3).get(1), WaterFill.WATER);
         assertEquals(waterFill.getData().get(5).get(2), WaterFill.WATER);
         assertEquals(waterFill.getData().get(1).get(0), WaterFill.BLOCK);
     }
+
+    @Test
+    public void allocatingTest1(){
+        int[] args = {1, 1, 2, 1, 1, 1, 1, 1, 1, 3, 1, 1, 2, 1, 1, 1};
+        WaterFill waterFill = new WaterFill(args);
+        waterFill.show();
+
+    }
+
 }

@@ -15,9 +15,9 @@ class VisualModel implements GLEventListener {
     private final GLU glu = new GLU();
 
     private float rAngle = 45.0f;
-    private float rx = 0.0f;
-    private float ry = 1.0f;
-    private float rz = 0.0f;
+    private float xScale = 0.0f;
+    private float yScale = 1.0f;
+    private float zScale = 0.0f;
     private float distance = -20.0f;
     private GLCanvas canvas;
     private VisualModel visualModelContext;
@@ -25,13 +25,13 @@ class VisualModel implements GLEventListener {
     private MouseController mouseController = new MouseController();
 
     public void show(List<List<Character>> map) {
-        GLProfile glp = GLProfile.getDefault();
-        GLCapabilities caps = new GLCapabilities(glp);
-        caps.setDepthBits(16);
-        caps.setHardwareAccelerated(true);
-        canvas = new GLCanvas(caps);
+        GLProfile defaultGLProfile = GLProfile.getDefault();
+        GLCapabilities capabilities = new GLCapabilities(defaultGLProfile);
+        capabilities.setDepthBits(32);
+        capabilities.setHardwareAccelerated(true);
+        canvas = new GLCanvas(capabilities);
 
-        Frame frame = new Frame("Waterfill Model");
+        final Frame frame = new Frame("Waterfill Model");
         frame.setExtendedState(Frame.MAXIMIZED_BOTH);
         frame.add(canvas);
         frame.setVisible(true);
@@ -46,6 +46,14 @@ class VisualModel implements GLEventListener {
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 System.exit(0);
+            }
+        });
+        frame.addWindowStateListener(new WindowStateListener() {
+            @Override
+            public void windowStateChanged(WindowEvent e) {
+                if(e.getNewState() == Frame.NORMAL){
+                    frame.setSize(640,640);
+                }
             }
         });
     }
@@ -89,7 +97,7 @@ class VisualModel implements GLEventListener {
         gl.glLoadIdentity();
         gl.glTranslatef(0.0f, -3.0f, distance);
 
-        gl.glRotatef(rAngle, rx, ry, rz);
+        gl.glRotatef(rAngle, xScale, yScale, zScale);
 
         int offset = map.size() / 2;
 
@@ -193,16 +201,16 @@ class VisualModel implements GLEventListener {
     }
 
     private class MouseController extends MouseAdapter {
-        private float sx;
+        private float lastXvalue;
 
         @Override
         public void mousePressed(MouseEvent e) {
-            sx = e.getX();
+            lastXvalue = e.getX();
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            visualModelContext.rAngle = -(sx - e.getX());
+            visualModelContext.rAngle = -(lastXvalue - e.getX());
             canvas.display();
         }
 
