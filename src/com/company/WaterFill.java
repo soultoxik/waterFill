@@ -17,6 +17,10 @@ class WaterFill {
     public static final Character BLOCK = 'm';
     public static final Character EMPTY = ' ';
 
+    /**
+     * Init map array with BLOCKs (given) and EMPTY (other) and fill this surface with water
+     * @param levels heights' levels
+     */
     public WaterFill(int[] levels){
         this.levels = levels;
         map = new ArrayList<List<Character>>(levels.length);
@@ -31,19 +35,14 @@ class WaterFill {
                 map.get(i).add(EMPTY);
             }
         }
-
         fill();
     }
 
-    public void show(){
-        for(int i = maxHeight - 1; i >= 0; --i){
-            for (List<Character> row : map) {
-                System.out.print(row.get(i) + " ");
-            }
-            System.out.println();
-        }
-    }
-
+    /**
+     * Search for maximum value
+     * @param array heights' levels
+     * @return position of maximum
+     */
     private static int max(int[] array) {
         int maximum = array[0];
         for (int value : array) {
@@ -54,7 +53,11 @@ class WaterFill {
         return maximum;
     }
 
-    public void fill(){
+    /**
+     * Fill map (surface) with water
+     * Iterates over separated (by 0) segments
+     */
+    private void fill(){
         int mark = 0;
         for(int i = 0; i < levels.length; ++i){
             if(levels[i] == 0 || i == levels.length - 1){
@@ -65,6 +68,11 @@ class WaterFill {
         }
     }
 
+    /**
+     * Fills segment with coords given
+     * @param left start point
+     * @param right end point
+     */
     private void fillIteration(int left, int right){
         int i = left;
         int leftMax;
@@ -81,6 +89,11 @@ class WaterFill {
         }
     }
 
+    /**
+     * Fills with water shelf
+     * @param leftMax start point
+     * @param rightLocalMax end point
+     */
     private void fillBetween(int leftMax, int rightLocalMax) {
         if(rightLocalMax == levels.length){
             return;
@@ -94,6 +107,12 @@ class WaterFill {
         }
     }
 
+    /**
+     * Finds first occurrence of maximum value on interval
+     * @param pos start point
+     * @param right end point
+     * @return position of max value
+     */
     private int posMax(int pos, int right) {
         int maximum = levels[pos+1];
         int maxPos = 0;
@@ -107,6 +126,12 @@ class WaterFill {
         return maxPos;
     }
 
+    /**
+     * Finds decreasing progression
+     * @param i start point
+     * @param right end point
+     * @return positions, where values began to decrease
+     */
     private int findDecreasingProgression(int i, int right) {
         int leftMax = levels[i];
         while (i + 1 < right && levels[i] <= levels[i + 1]){
@@ -119,8 +144,17 @@ class WaterFill {
     }
 
 
+    /**
+     * Get count of WATER blocks
+     * @return count
+     */
     public int getWaterCount() {
         return waterCount;
     }
+
+    /**
+     * Get map (surface) with BLOCK and WATER blocks
+     * @return map
+     */
     public List<List<Character>> getData(){ return map;}
 }

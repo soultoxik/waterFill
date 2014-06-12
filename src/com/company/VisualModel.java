@@ -24,25 +24,23 @@ class VisualModel implements GLEventListener {
     private List<List<Character>> map;
     private MouseController mouseController = new MouseController();
 
+
+    /**
+     *
+     * Shows frame with 3D model of water filling
+     * @param map two-dimension map of earth/water, extracted from WaterFill
+     *            @see WaterFill#getData()
+     */
     public void show(List<List<Character>> map) {
-        GLProfile defaultGLProfile = GLProfile.getDefault();
-        GLCapabilities capabilities = new GLCapabilities(defaultGLProfile);
-        capabilities.setDepthBits(32);
-        capabilities.setHardwareAccelerated(true);
-        canvas = new GLCanvas(capabilities);
+        final Frame frame = initFrame(map);
+        addFrameListeners(frame);
+    }
 
-        final Frame frame = new Frame("Waterfill Model");
-        frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-        frame.add(canvas);
-        frame.setVisible(true);
-
-        visualModelContext = new VisualModel();
-        visualModelContext.map = map;
-        canvas.addGLEventListener(visualModelContext);
-        canvas.addMouseListener(mouseController);
-        canvas.addMouseMotionListener(mouseController);
-        canvas.addMouseWheelListener(mouseController);
-
+    /**
+     * Adds close and resizing listeners
+     * @param frame target frame
+     */
+    private void addFrameListeners(final Frame frame) {
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 System.exit(0);
@@ -58,6 +56,37 @@ class VisualModel implements GLEventListener {
         });
     }
 
+    /**
+     *
+     * @param map two-dimension map of earth/water, extracted from WaterFill
+     *            @see WaterFill#getData()
+     * @return initialized frame
+     */
+    private Frame initFrame(List<List<Character>> map) {
+        GLProfile defaultGLProfile = GLProfile.getDefault();
+        GLCapabilities capabilities = new GLCapabilities(defaultGLProfile);
+        canvas = new GLCanvas(capabilities);
+
+        final Frame frame = new Frame("Waterfill Model");
+        frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+        frame.add(canvas);
+        frame.setVisible(true);
+
+        visualModelContext = new VisualModel();
+        visualModelContext.map = map;
+        canvas.addGLEventListener(visualModelContext);
+        canvas.addMouseListener(mouseController);
+        canvas.addMouseMotionListener(mouseController);
+        canvas.addMouseWheelListener(mouseController);
+        return frame;
+    }
+
+    /**
+     * Overrode method of GLEventListener
+     * Runs only once
+     * Contains first-start initializations
+     * @param glAutoDrawable
+     */
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {
         GL2 gl = glAutoDrawable.getGL().getGL2();
@@ -75,6 +104,14 @@ class VisualModel implements GLEventListener {
         render(glAutoDrawable);
     }
 
+    /**
+     * Contains reshaping logic and init of GLU view
+     * @param glAutoDrawable
+     * @param x x-position of window
+     * @param y y-position of window
+     * @param width window's width
+     * @param height window's height
+     */
     @Override
     public void reshape(GLAutoDrawable glAutoDrawable, int x, int y, int width, int height) {
         GL2 gl = glAutoDrawable.getGL().getGL2();
@@ -84,12 +121,16 @@ class VisualModel implements GLEventListener {
 
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
-        glu.gluPerspective(45.0, aspect, 0.1, 100.0);
+        glu.gluPerspective(45, aspect, 0.1, 100.0);
 
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
     }
 
+    /**
+     * Render's logic
+     * @param glAutoDrawable
+     */
     private void render(GLAutoDrawable glAutoDrawable) {
         GL2 gl = glAutoDrawable.getGL().getGL2();
 
@@ -108,8 +149,16 @@ class VisualModel implements GLEventListener {
         }
     }
 
+    /**
+     * Method renders one cube with x and y positions given with color of given type
+     * @param gl inited GL2
+     * @param x x-position of left-bottom-front point of cube
+     * @param y y-position of left-bottom-front point of cube
+     * @param type type of cube
+     *             @see com.company.WaterFill#BLOCK or
+     *             @see com.company.WaterFill#EMPTY
+     */
     private void renderCube(GL2 gl, float x, float y, Character type) {
-
         if (type == WaterFill.BLOCK) {
             gl.glColor3f(0.62f, 0.32f, 0.18f); //brown color
         } else if (type == WaterFill.WATER) {
@@ -117,7 +166,8 @@ class VisualModel implements GLEventListener {
         } else return;
 
         gl.glBegin(GL2.GL_QUADS);
-        // Top-face
+
+        // Bottom-face
         gl.glVertex3f(x + CUBE_SIZE, y, -1.0f);
         gl.glVertex3f(x, y, -1.0f);
         gl.glVertex3f(x, y, 1.0f);
@@ -127,7 +177,7 @@ class VisualModel implements GLEventListener {
         gl.glVertex3f(x + CUBE_SIZE, y + CUBE_SIZE, 1.0f);
         gl.glVertex3f(x, y + CUBE_SIZE, 1.0f);
         gl.glVertex3f(x, y + CUBE_SIZE, -1.0f);
-        gl.glVertex3f(x, y + CUBE_SIZE, -1.0f);
+        gl.glVertex3f(x + CUBE_SIZE, y + CUBE_SIZE, -1.0f);
 
         // Front-face
         gl.glVertex3f(x + CUBE_SIZE, y + CUBE_SIZE, 1.0f);
@@ -138,8 +188,9 @@ class VisualModel implements GLEventListener {
         // Back-face
         gl.glVertex3f(x + CUBE_SIZE, y + CUBE_SIZE, -1.0f);
         gl.glVertex3f(x, y + CUBE_SIZE, -1.0f);
-        gl.glVertex3f(x, y + CUBE_SIZE, -1.0f);
+        gl.glVertex3f(x, y, -1.0f);
         gl.glVertex3f(x + CUBE_SIZE, y, -1.0f);
+
 
         // Left-face
         gl.glVertex3f(x, y, 1.0f);
@@ -203,17 +254,29 @@ class VisualModel implements GLEventListener {
     private class MouseController extends MouseAdapter {
         private float lastXvalue;
 
+        /**
+         * Saves x-value on mouse pressed
+         * @param e
+         */
         @Override
         public void mousePressed(MouseEvent e) {
             lastXvalue = e.getX();
         }
 
+        /**
+         * Re-renders scene with new angle of view
+         * @param e
+         */
         @Override
         public void mouseDragged(MouseEvent e) {
             visualModelContext.rAngle = -(lastXvalue - e.getX());
             canvas.display();
         }
 
+        /**
+         * Change the distance by mouse wheel
+         * @param e
+         */
         @Override
         public void mouseWheelMoved(MouseWheelEvent e) {
             visualModelContext.distance += e.getWheelRotation();

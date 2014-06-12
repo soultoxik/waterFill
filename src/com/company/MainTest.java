@@ -26,12 +26,4 @@ public class MainTest {
         assertEquals(waterFill.getData().get(1).get(0), WaterFill.BLOCK);
     }
 
-    @Test
-    public void allocatingTest1(){
-        int[] args = {1, 1, 2, 1, 1, 1, 1, 1, 1, 3, 1, 1, 2, 1, 1, 1};
-        WaterFill waterFill = new WaterFill(args);
-        waterFill.show();
-
-    }
-
 }
